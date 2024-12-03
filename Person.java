@@ -15,7 +15,7 @@ public Person(int floorNowOn, int destination, int maxWaitTime, int waitingForEl
     this.elevNowIn = elevNowIn;
 }
 
-/*Controla o que uma pessoa faz durante cada tick do relógio da simulação */
+/*Controla o que uma pessoa faz durante cada tick do relógio da simulação (pág34)*/
 public void action(){
    //decidir se uma pessoa de fora deve entrar no prédio
    if (floorNowOn < 0) {           // se não estiver no prédio
@@ -91,27 +91,71 @@ public void action(){
   } 
 }
 
-  
-public int upWaiting(int floorNumber){
-    return floorNumber;
+/* retornar verdadeiro se esta pessoa estiver esperando um elevador no andar especificado (pág35)*/ 
+public int upWaiting(int floorNumber) {
+   return ((waitingForElev)         )
+           (floorNowOn == floorNumber)
+           (destination > floorNowOn));
+  //return (waitingForElev && floorNowOn == floorNumber && destination > floorNowOn) ? 1 : 0;
 }
 
+/* retornar verdadeiro se esta pessoa estiver esperando um elevador para descer no andar especificado */
 public int dnWaiting(int floorNumber){
-    return floorNumber;
-
+    return ((waitingForElev         )
+            (floorNumber == floorNumber)
+            (destination < floorNowOn );
 }
 
+/* Faça a pessoa entrar no elevador se estiver esperando por um elevador neste andar, independentemente 
+da direção. (O elevador está vazio e a pessoa determinará sua direção.) Retorne o destino da pessoa em
+pdest para simular que a pessoa pressionou um dos botões do andar do elevador (36)*/
 public int loadIfWaiting(int elevNumber, int floorNumber, int pdest){
-    return pdest;
+    if (waitingForElev (floorNowOn == floorNumber)) {
+       waitingForElev = 0;      // Not waiting any longer
+       elevNowIn = elevNumber;  // Save elevator number
+       pdest = destination;     // Pass person's destination back
+       return true;             // Person got on board
+    }
+    return false;              // Person did not get on board
 }
 
+/* Carregue a pessoa se estiver esperando um elevador indo na direção especificada. Retorne o destino da pessoa
+em pdest para simular que a pessoa está pressionando um dos botões de andar do elevador. Semelhante a loadIfWaiting(), mas
+carrega apenas pessoas subindo ou descendo (pag36).
+*/
 public int loadIfGoing(int elevNumber, int floorNumber, int direction, int pdest){
-    return pdest;
+    int pdir;         // Direção da pessoa, up or down
+    
+    if (destination > floorNumber) {
+      pdir = up;
+    }else{
+      pdir = down;
+    }  (waitingForElev (floorNowOn == floorNumber)&&(direction == pdir)) {
+       waitingForElev = 0;
+       elevNowIn = elevNumber;
+       pdest = destination;
+       return true;
+    }
+    return false;
+}   
 
-}
+/* Se essa pessoa estiver no elevador específico e for o cabeçalho do número do andar designado, faça essa pessoa
+sair do elevador. Retorne true se a pessoa sair; caso contrário, retorne false. Defina o tempo de espera da pessoa
+para o número de segundos em que essa pessoa permanecerá no andar, a menos que o andar seja 0, caso em que a pessoa
+sairá do prédio imediatamente(pag37).
+*/
 
 public int discharge(int elevNumber, int floorNumber){
-    return floorNumber;
-}
+    if ((elevNowIn == elevNumber) && (destination == floorNumber)){
+      elevNowIn = -1;               //get out of elevator
+      floorNowOn = destination;      // Set floor person is on
+      if (floorNowOn != 0){ 
+         maxWaitTime = BUSINESS;     // Set time to spend on floor
+       return true;                  // Person got off elevator
+      }else{
+         return false;               // Person did not exit
+      }
+    }
+  }
 
 }
